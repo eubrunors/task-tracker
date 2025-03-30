@@ -26,9 +26,10 @@ class Task{
         if( $this -> action === "add"){
             $this->addTask();
         }
-//        elseif ( $action == "delete"){
-//            // do something
-//        }elseif ( $action == "update"){
+        elseif ( $this -> action === "update"){
+            $this->updateTask();
+        }
+//        elseif ( $action == "update"){
 //            // do something
 //        }elseif ( $action == "list"){
 //            // do something
@@ -57,5 +58,25 @@ class Task{
 
         echo "Output: Task added successfully (ID: $newID)\n";
     }
+    public function updateTask(){
+        $tasks = file_exists($this->file) ? json_decode(file_get_contents($this->file), true) : [];
+
+        $taskFound = false;
+        foreach($tasks as &$task){
+            if($task['id'] === $this -> taskID){
+                $task['description'] = $this -> message;
+                $task['updatedAt'] = date("Y-m-d H:i:s");
+                $taskFound = true;
+                break;
+            }
+        }
+        if($taskFound){
+            file_put_contents($this->file, json_encode($tasks, JSON_PRETTY_PRINT));
+            echo "Output: Task updated successfully (ID: $this->taskID)\n";
+        } else {
+            echo "Task with ID: $this->taskID not found\n";
+        }
+    }
+
 
 }
