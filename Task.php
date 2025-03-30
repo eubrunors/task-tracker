@@ -3,10 +3,10 @@
 //namespace
 class Task{
 
-    private $action;
-    private $taskID;
-    private $message;
-    private $file = 'task.json';
+A   private string $action;
+    private int $taskID;
+    private string $message;
+    private const string FILE_PATH = 'task.json';
 
     public function __construct(string $action, int $taskID = 0, string $message = ''){
         $this->action = $action;
@@ -14,8 +14,17 @@ class Task{
         $this->message = $message;
     }
 
+    private function loadTasks(): array
+    {
+        return file_exists(self::FILE_PATH) ? json_decode(file_get_contents(self::FILE_PATH), true) : [];
+    }
 
-    public function displayTask(){
+    private function saveTasks(array $tasks): void
+    {
+        file_put_contents(self::FILE_PATH, json_encode($tasks, JSON_PRETTY_PRINT));
+    }
+
+    public function displayTask(): array{
         return[
             "action" => $this->action,
             "taskID" => $this->taskID,
@@ -23,7 +32,7 @@ class Task{
         ];
     }
 
-    public function getAction(){
+    public function getAction():void {
         if( $this -> action === "add"){
             $this->addTask();
         }
@@ -40,9 +49,8 @@ class Task{
         }
     }
 
-    public function addTask(){
-        $tasks = file_exists($this->file) ? json_decode(file_get_contents($this->file), true) : [];
-
+    public function addTask():void{
+        $tasks = $this->loadTasks();
         $newID = count($tasks) > 0 ? (end($tasks)['id']+1) : 1;
 
         $newTask = [
@@ -55,32 +63,32 @@ class Task{
 
         $tasks[] = $newTask;
 
-        file_put_contents($this->file, json_encode($tasks, JSON_PRETTY_PRINT));
+        $this->saveTasks($tasks);
 
         echo "Output: Task added successfully (ID: $newID)\n";
     }
-    public function updateTask(){
-        $tasks = file_exists($this->file) ? json_decode(file_get_contents($this->file), true) : [];
+    public function updateTask(): void{
+        $tasks = $this->loadTasks();
 
         $taskFound = false;
         foreach($tasks as &$task){
             if($task['id'] === $this -> taskID){
                 $task['description'] = $this -> message;
                 $task['updatedAt'] = date("Y-m-d H:i:s");
+                $this->saveTasks($tasks);
                 $taskFound = true;
                 break;
             }
         }
         if($taskFound){
-            file_put_contents($this->file, json_encode($tasks, JSON_PRETTY_PRINT));
             echo "Output: Task updated successfully (ID: $this->taskID)\n";
         } else {
             echo "Task with ID: $this->taskID not found\n";
         }
     }
 
-    public function deleteTask(){
-        $tasks = file_exists($this->file) ? json_decode(file_get_contents($this->file), true) : [];
+    public function deleteTask(): void{
+        $tasks = $this->loadTasks();
         $taskFound = false;
 
         foreach($tasks as $key => $task){
@@ -91,8 +99,7 @@ class Task{
             }
         }
         if($taskFound){
-            $tasks = array_values($tasks);
-            file_put_contents($this->file, json_encode($tasks, JSON_PRETTY_PRINT));
+            $this->saveTasks(array_values($tasks));
             echo "Output: Task deleted successfully (ID: $this->taskID)\n";
 
         } else {
@@ -100,26 +107,22 @@ class Task{
         }
     }
 
-    public function listAllTasks(){
-        if(file_exists($this->file)){
-            $tasks = json_decode(file_get_contents($this->file), true);
-            if(count($tasks) > 0){
-                echo "Listing all tasks:\n";
-                foreach($tasks as $task){
-                    echo "id: $task[id]\n";
-                    echo "description: $task[description]\n";
-                    echo "status: $task[status]\n";
-                    echo "createdAt: $task[createdAt]\n";
-                    echo "updatedAt: $task[updatedAt]\n";
-                    echo "----------------------------------\n";
-                }
+    public function listAllTasks(): void{
+        $tasks = $this->loadTasks();
 
-            } else {
-                echo "No tasks found\n";
+        if(!empty($tasks)){
+            echo "Listing all tasks:\n";
+            foreach($tasks as $task){
+                echo "id: $task[id]\n";
+                echo "description: $task[description]\n";
+                echo "status: $task[status]\n";
+                echo "createdAt: $task[createdAt]\n";
+                echo "updatedAt: $task[updatedAt]\n";
+                echo "----------------------------------\n";
             }
 
-        } else {
-            echo "Tasks file not found\n";
+        }else{
+            echo "No tasks found\n";
         }
     }
 }
