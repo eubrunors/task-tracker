@@ -29,11 +29,11 @@ class Task{
         elseif ( $this -> action === "update"){
             $this->updateTask();
         }
-//        elseif ( $action == "update"){
-//            // do something
-//        }elseif ( $action == "list"){
-//            // do something
-//        }
+        elseif ( $this->action === "delete"){
+            $this->deleteTask();
+        }elseif ( $this->action == "list"){
+            $this->listAllTasks();
+        }
         else{
             echo "error: action not known";
         }
@@ -78,5 +78,46 @@ class Task{
         }
     }
 
+    public function deleteTask(){
+        $tasks = file_exists($this->file) ? json_decode(file_get_contents($this->file), true) : [];
+        $taskFound = false;
+        foreach($tasks as &$task){
+            if($task['id'] === $this -> taskID){
+                unset($task);
+                $taskFound = true;
+                break;
+            }
+        }
+        if($taskFound){
+            $tasks = array_values($tasks);
+            file_put_contents($this->file, json_encode($tasks, JSON_PRETTY_PRINT));
+            echo "Output: Task deleted successfully (ID: $this->taskID)\n";
 
+        } else {
+            echo "Task with ID: $this->taskID not found\n";
+        }
+    }
+
+    public function listAllTasks(){
+        if(file_exists($this->file)){
+            $tasks = json_decode(file_get_contents($this->file), true);
+            if(count($tasks) > 0){
+                echo "Listing all tasks:\n";
+                foreach($tasks as $task){
+                    echo "id: $task[id]\n";
+                    echo "description: $task[description]\n";
+                    echo "status: $task[status]\n";
+                    echo "createdAt: $task[createdAt]\n";
+                    echo "updatedAt: $task[updatedAt]\n";
+                    echo "----------------------------------\n";
+                }
+
+            } else {
+                echo "No tasks found\n";
+            }
+
+        } else {
+            echo "Tasks file not found\n";
+        }
+    }
 }
