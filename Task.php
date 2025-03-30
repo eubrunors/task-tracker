@@ -14,6 +14,7 @@ class Task{
         $this->message = $message;
     }
 
+
     public function displayTask(){
         return[
             "action" => $this->action,
@@ -81,9 +82,10 @@ class Task{
     public function deleteTask(){
         $tasks = file_exists($this->file) ? json_decode(file_get_contents($this->file), true) : [];
         $taskFound = false;
-        foreach($tasks as &$task){
+
+        foreach($tasks as $key => $task){
             if($task['id'] === $this -> taskID){
-                unset($task);
+                unset($tasks[$key]);
                 $taskFound = true;
                 break;
             }
