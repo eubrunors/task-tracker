@@ -15,10 +15,12 @@
 
     } elseif ($argv[1] === "delete") {
         $taskID = isset($argv[2]) ? (int)$argv[2] : 0;
-        $message = null;
+        $message = ' ';
+
     }elseif ($argv[1] === "list"){
         $taskID = 0;
         $message = ' ';
+
     }else{
         echo "Invalid action.\n";
         exit;
