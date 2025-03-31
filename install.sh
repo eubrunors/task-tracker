@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Check if PHP is installed
+if ! command -v php &> /dev/null; then
+    echo "PHP is not installed. Please install PHP to proceed."
+    exit 1
+fi
+
 if ! grep -q "alias task-cli=" ~/.bashrc; then
     echo "Adding alias to ~/.bashrc"
     echo "alias task-cli='$(pwd)/task-cli.php'" >> ~/.bashrc
