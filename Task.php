@@ -56,7 +56,7 @@ class Task {
         ];
         $tasks[] = $newTask;
         $this->saveTasks($tasks);
-        $this->logTaskAddUpdateDelete(true);
+        echo "Output: Task added successfully (ID: $newID)\n";
     }
 
     public function updateTask(): void {
@@ -72,8 +72,7 @@ class Task {
                 break;
             }
         }
-        $this->logTaskAddUpdateDelete($taskFound);
-
+        $this->logTaskUpdateDelete($taskFound);
     }
 
     public function deleteTask(): void {
@@ -88,8 +87,7 @@ class Task {
                 break;
             }
         }
-        $this->logTaskAddUpdateDelete($taskFound);
-
+        $this->logTaskUpdateDelete($taskFound);
     }
 
     public function listAllTasks(): void {
@@ -187,7 +185,7 @@ class Task {
             echo "Task with ID: $this->taskID not found\n";
         }
     }
-    private function logTaskAddUpdateDelete(bool $taskFound):void {
+    private function logTaskUpdateDelete(bool $taskFound):void {
         if ($taskFound) {
             echo "Output: Task $this->action successfully (ID: $this->taskID)\n";
         } else {
