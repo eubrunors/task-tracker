@@ -40,10 +40,7 @@ class Task {
         } elseif ($this->action === "list" && $this->message === ' ') { $this->listAllTasks();
         } elseif ($this->action === "list" && $this->message === 'done') { $this->listTasksByStatus();
         } elseif ($this->action === "list" && $this->message === 'todo') { $this->listTasksByStatus();
-        } elseif ($this->action === "list" && $this->message === 'in-progress') { $this->listTasksByStatus();
-        } else {
-            echo "error: action not known";
-        }
+        } elseif ($this->action === "list" && $this->message === 'in-progress') { $this->listTasksByStatus(); }
     }
 
     public function addTask(): void {
@@ -57,12 +54,9 @@ class Task {
             "createdAt" => date("Y-m-d H:i:s"),
             "updatedAt" => date("Y-m-d H:i:s")
         ];
-
         $tasks[] = $newTask;
-
         $this->saveTasks($tasks);
-
-        echo "Output: Task added successfully (ID: $newID)\n";
+        $this->logTaskAddUpdateDelete(true);
     }
 
     public function updateTask(): void {
@@ -78,11 +72,8 @@ class Task {
                 break;
             }
         }
-        if ($taskFound) {
-            echo "Output: Task updated successfully (ID: $this->taskID)\n";
-        } else {
-            echo "Task with ID: $this->taskID not found\n";
-        }
+        $this->logTaskAddUpdateDelete($taskFound);
+
     }
 
     public function deleteTask(): void {
@@ -93,16 +84,12 @@ class Task {
             if ($task['id'] === $this->taskID) {
                 unset($tasks[$key]);
                 $taskFound = true;
+                $this->saveTasks(array_values($tasks));
                 break;
             }
         }
-        if ($taskFound) {
-            $this->saveTasks(array_values($tasks));
-            echo "Output: Task deleted successfully (ID: $this->taskID)\n";
+        $this->logTaskAddUpdateDelete($taskFound);
 
-        } else {
-            echo "Task with ID: $this->taskID not found\n";
-        }
     }
 
     public function listAllTasks(): void {
@@ -146,6 +133,7 @@ class Task {
     }
 
     public function markDoneTask(): void {
+        $this->message = 'done';
         $tasks = $this->loadTasks();
         $taskFound = false;
         foreach ($tasks as &$task) {
@@ -157,14 +145,11 @@ class Task {
                 break;
             }
         }
-        if ($taskFound) {
-            echo "Output: Task done successfully (ID: $this->taskID)\n";
-        } else {
-            echo "Task with ID: $this->taskID not found\n";
-        }
+        $this->logMarkTask($taskFound);
     }
 
     public function markInProgressTask(): void {
+        $this->message = 'in-progress';
         $tasks = $this->loadTasks();
         $taskFound = false;
         foreach ($tasks as &$task) {
@@ -176,14 +161,11 @@ class Task {
                 break;
             }
         }
-        if ($taskFound) {
-            echo "Output: Task in-progress successfully (ID: $this->taskID)\n";
-        } else {
-            echo "Task with ID: $this->taskID not found\n";
-        }
+        $this->logMarkTask($taskFound);
     }
 
     public function markTodoTask(): void {
+        $this->message = 'todo';
         $tasks = $this->loadTasks();
         $taskFound = false;
         foreach ($tasks as &$task) {
@@ -195,8 +177,19 @@ class Task {
                 break;
             }
         }
+        $this->logMarkTask($taskFound);
+    }
+
+    private function logMarkTask(bool $taskFound):void {
         if ($taskFound) {
-            echo "Output: Task todo successfully (ID: $this->taskID)\n";
+            echo "Output: Task marked $this->message with successfully (ID: $this->taskID)\n";
+        } else {
+            echo "Task with ID: $this->taskID not found\n";
+        }
+    }
+    private function logTaskAddUpdateDelete(bool $taskFound):void {
+        if ($taskFound) {
+            echo "Output: Task $this->action successfully (ID: $this->taskID)\n";
         } else {
             echo "Task with ID: $this->taskID not found\n";
         }
