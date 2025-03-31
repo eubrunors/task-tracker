@@ -10,8 +10,8 @@ These instructions will help you set up and run the Task Tracker CLI on your loc
 
 #### Prerequisites
 
--PHP (7.x or higher)
--Bash shell (for alias setup)
+- PHP (7.x or higher)
+- Bash shell (for alias setup)
 
 #### Project Initialization
 
